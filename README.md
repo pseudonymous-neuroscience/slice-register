@@ -2,6 +2,18 @@
 
 This utility registers fMRI data to a reference volume, one slice at a time.
 
+## Installing
+
+choose your flavor and download the appropriate executable:
+
+[Java](https://github.com/pseudonymous-neuroscience/slice-register/blob/main/java/slice-register_1.0.0.jar)
+
+[Windows](https://github.com/pseudonymous-neuroscience/slice-register/blob/main/java/slice-register_1.0.0.exe)
+
+[Linux](https://github.com/pseudonymous-neuroscience/slice-register/blob/main/java/slice-register_1.0.0_linux)
+
+The executables are self-contained and shouldn't require anything special. Linux users may need to `chmod +x slice-register_1.0.0_linux`
+
 ## Running the program from the command line
 
 The program takes a nifti file (.nii or .nii.gz extension) as input, and outputs a series of .json files.
@@ -10,21 +22,21 @@ The program takes a nifti file (.nii or .nii.gz extension) as input, and outputs
 
 <b>Step 1:</b> generate a registration schedule
 
-`java -jar slice-register_1.0.0.jar generate -i <input_file.nii(.gz)> -o <schedule_file.json>`
+`java -jar slice-register_1.0.0.jar generate -i {input_file.nii(.gz)} -o {schedule_file.json}`
 
 This creates a .json file that can be edited to change options for registration.
 
 <b>Step 2:</b> perform registration on each desired source/reference pair
 
-`java -jar slice-register_1.0.0.jar register -i <schedule_file.json> -o <output_folder> -s <source_volume_number> -r <reference_volume_number>`
+`java -jar slice-register_1.0.0.jar register -i {schedule_file.json} -o {output_folder} -s {source_volume_number} -r {reference_volume_number}`
 
-<schedule_file.json> should point to the schedule file you created/edited in the previous step.
+{schedule_file.json} should point to the schedule file you created/edited in the previous step.
 
-<source_volume_number> and <reference_volume_number> are integers, the first volume is 0.
+{source_volume_number} and {reference_volume_number} are integers, the first volume is 0.
 
-The registration results will be saved to <registration_folder>/<input_file>_vol-<ref>-<src>.json
+The registration results will be saved to {registration_folder}/{input_file}_vol-{ref}-{src}.json
 
-The individual steps of the gradient descent process will be saved to <registration_folder>/<logs>
+The individual steps of the gradient descent process will be saved to {registration_folder}/logs
 
 <b>Step 3:</b> (in process) interpolate registered slices into a uniformly distributed output nifti file
 
