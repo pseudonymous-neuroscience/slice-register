@@ -1,87 +1,118 @@
 # slice-register
 
-## Getting started
+This utility registers fMRI data to a reference volume, one slice at a time.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Running the program from the command line
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+The program takes a nifti file (.nii or .nii.gz extension) as input, and outputs a series of .json files.
 
-## Add your files
+### Java (requires 1.8 or higher)
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+<b>Step 1:</b> generate a registration schedule
 
-```
-cd existing_repo
-git remote add origin https://github.com/pseudonymous-neuroscience/slice-register.git
-git branch -M main
-git push -uf origin main
-```
+`java -jar slice-register_1.0.0.jar generate -i <input_file.nii(.gz)> -o <schedule_file.json>`
 
-## Collaborate with your team
+This creates a .json file that can be edited to change options for registration.
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+<b>Step 2:</b> perform registration on each desired source/reference pair
 
-## Test and Deploy
+`java -jar slice-register_1.0.0.jar register -i <schedule_file.json> -o <output_folder> -s <source_volume_number> -r <reference_volume_number>`
 
-Use the built-in continuous integration in GitLab.
+<schedule_file.json> should point to the schedule file you created/edited in the previous step.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+<source_volume_number> and <reference_volume_number> are integers, the first volume is 0.
 
-***
+The registration results will be saved to <registration_folder>/<input_file>_vol-<ref>-<src>.json
 
-# Editing this README
+The individual steps of the gradient descent process will be saved to <registration_folder>/<logs>
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+<b>Step 3:</b> (in process) interpolate registered slices into a uniformly distributed output nifti file
 
-## Suggestions for a good README
+The current focus is on the physical causes of the translations that occur in the scanner and how different scanners behave differently.
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
 
-## Name
-Choose a self-explaining name for your project.
+### Sharding
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+You can optionally split the file into volumes:
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+`java -jar slice-register_1.0.0.jar shard -i <input_file> -o <output_folder>`
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+This will create a "shard" folder that contains each volume, which allows volumes to be processed separately. This can save memory and bandwidth for processing on multiple machines.
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+### Native executables
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+The .jar file was compiled using GraalVM to be run natively in Windows (slice-register_1.0.0.exe) or Linux/Mac (slice-register_1.0.0) environments. Just replace the "java -jar slice-register_1.0.0.jar" part of each command with the path to the executable, e.g.:
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+`slice-register_1.0.0.exe generate -i <input_file.nii(.gz)> -o <schedule_file.json>`
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+`slice-register_1.0.0.exe register -i <schedule_file.json> -o <output_folder> -s <source_volume_number> -r <reference_volume_number>`
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+`slice-register_1.0.0.exe shard -i <input_file> -o <output_folder>`
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+## Program logic overview
+
+The registration process itself occurs in a series of steps like gradient descent. For each iteration, a cost function is calculated for a series of probes, and which probe has the lowest cost determines what happens next.
+
+If the lowest cost is somewhere in the middle of the probes, the span of the probe array for the next iteration is narrowed.
+
+If the lowest cost is on the edge of the probe array, the span of the probe array for the next iteration is widened.
+
+The process continues until some stopping criteria is met:
+- the cost stops descending for a number of iterations
+- the span of the probe array remains sufficiently narrorw for a number of iterations
+- some maximum number of iterations is reached
+
+The cost function used is the mean squared difference between the source data and the transformed reference data.
+
+All data is sampled using coordinates, with cubic interpolation. There is no slice-time correction for data during registration.
+
+
+## Schedule configuration
+
+Each schedule is an array of scales, and each scale can be tweaked individually. The result of registration at one scale is meant to be fed as a starting point into the next scale in the sequence.
+
+      "degreesOfFreedom":  
+      6-> rotate and translate 
+      3-> translate only
+      2-> translate x and y only
+      1-> translate y only
+
+      "doSlices": 
+      false -> register source volume to reference volume
+      true -> register source slice to reference volume
+
+      "adjustmentStart": 0.01
+      the fraction of the total range that we span with the probes
+      
+      "maxScaleStart": 1.5,
+      determines how the probe array is scaled for the next iteration when the lowest cost is at the edge of the probe array
+      
+      "minScaleStart": 0.5,
+      determines how the probe array is scaled for the next iteration when the lowest cost is in the center of the probe array
+      
+      "stopThresholdStart": 1.0E-12,
+      the reduction in cost we consider too insignificant to keep going
+
+      "maxStagnantIterations": 30,
+      the number of times we have to hit threshold criteria in order to stop gradient descent
+      
+      "tweakStopThreshold": true,
+      
+      "doFrequencyScaling": false,
+      no longer used
+      
+      "downSampleCount": 1,
+      the number of times the nifti file is halved in each spatial dimension, for faster volume-to-volume comparisons
+      
+      "isParabolic":  
+      false -> creates an array of probes and calculates the cost for each of them, choosing the lowest
+      true -> creates three probes and fits a parabola to their costs to compute the location of the expected minimum
+
+These are all hyperparameters that could theoretically be tuned using gradient descent, using some combination of time to compute and accuracy in their own cost function.
+
+There are additional settings in the program that can be elevated to schedule configuration in the future.
 
 ## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+This project is public domain, use it however you like.
