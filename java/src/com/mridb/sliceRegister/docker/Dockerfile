@@ -1,0 +1,23 @@
+FROM ubuntu:latest
+MAINTAINER <alexcohen@gmail.com> # feel free to change/adopt
+
+# Install Dependencies
+RUN apt-get update && apt-get upgrade -y && \
+	apt-get install -y \
+	build-essential \
+	pkg-config \
+	git \
+	wget \
+	pigz && \
+	apt-get clean -y && apt-get autoclean -y && apt-get autoremove -y
+
+RUN apt-get install -y \
+	cmake
+	
+# Get dcm2niix from github and compile
+RUN cd /tmp && \
+	git clone https://github.com/rordenlab/dcm2niix.git && \
+	cd dcm2niix && mkdir build && cd build && \
+	cmake -DBATCH_VERSION=ON -DUSE_OPENJPEG=ON .. && \
+	make && make install
+
