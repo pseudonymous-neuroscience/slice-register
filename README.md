@@ -4,7 +4,7 @@ This utility registers fMRI data to a reference volume, one slice at a time.
 
 ## Installing
 
-choose your flavor and download the appropriate executable:
+Choose your executable file based on your preferred platform:
 
 [Java](https://github.com/pseudonymous-neuroscience/slice-register/blob/main/java/slice-register_1.0.0.jar)
 
@@ -12,7 +12,9 @@ choose your flavor and download the appropriate executable:
 
 [Linux](https://github.com/pseudonymous-neuroscience/slice-register/blob/main/java/slice-register_1.0.0_linux)
 
-The executables are self-contained and shouldn't require anything special. Linux users may need to `chmod +x slice-register_1.0.0_linux`
+The executables are self-contained and shouldn't require anything special. Linux users may need to add execution permission:
+
+`chmod +x slice-register_1.0.0_linux`
 
 ## Running the program from the command line
 
