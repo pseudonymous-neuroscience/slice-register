@@ -6,9 +6,9 @@ This utility registers fMRI data to a reference volume, one slice at a time.
 
 Choose your executable file based on your preferred platform:
 
-[Java](https://github.com/pseudonymous-neuroscience/slice-register/blob/main/java/slice-register_1.0.0.jar)
+[Java](https://gitlab.com/geoffmay/slice-register/-/raw/main/java/slice-register_1.0.0.jar?inline=false)
 
-[Windows](https://github.com/pseudonymous-neuroscience/slice-register/blob/main/java/slice-register_1.0.0.exe)
+[Windows](https://gitlab.com/geoffmay/slice-register/-/raw/main/java/slice-register_1.0.0.exe?inline=false)
 
 [Linux](https://gitlab.com/geoffmay/slice-register/-/raw/main/java/slice-register_1.0.0_linux?inline=false)
 
