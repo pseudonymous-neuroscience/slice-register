@@ -10,7 +10,7 @@ Choose your executable file based on your preferred platform:
 
 [Windows](https://github.com/pseudonymous-neuroscience/slice-register/blob/main/java/slice-register_1.0.0.exe)
 
-[Linux](https://github.com/pseudonymous-neuroscience/slice-register/blob/main/java/slice-register_1.0.0_linux)
+[Linux](https://gitlab.com/geoffmay/slice-register/-/raw/main/java/slice-register_1.0.0_linux?inline=false)
 
 The executables are self-contained and shouldn't require anything special. Linux users may need to add execution permission:
 
